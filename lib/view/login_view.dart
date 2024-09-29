@@ -1,8 +1,8 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'dart:developer' as devtools show log;
 
 import 'package:todo/constants/routes.dart';
+import 'package:todo/utilities/show_error_dialog.dart';
 
 class LoginView extends StatefulWidget {
   const LoginView({super.key});
@@ -66,6 +66,7 @@ class _LoginViewState extends State<LoginView> {
               try {
                 await FirebaseAuth.instance.signInWithEmailAndPassword(
                     email: email, password: password);
+                if (!context.mounted) return;
                 // ignore: use_build_context_synchronously
                 Navigator.of(context).pushNamedAndRemoveUntil(
                   notesRoute,
@@ -73,10 +74,35 @@ class _LoginViewState extends State<LoginView> {
                 );
               } on FirebaseAuthException catch (e) {
                 if (e.code == 'User-not-found') {
-                  devtools.log('User not found');
-                } else if (e.code == 'wront-password') {
-                  devtools.log('Weak passsword');
+                  await showErrorDialog(
+                    // ignore: use_build_context_synchronously
+                    context,
+                    'User-not-found',
+                  );
+                } else if (e.code == 'wrong-password') {
+                  await showErrorDialog(
+                    // ignore: use_build_context_synchronously
+                    context,
+                    'wrong-password',
+                  );
+                } else if (e.code == 'invalid-credential') {
+                  await showErrorDialog(
+                    // ignore: use_build_context_synchronously
+                    context,
+                    'invalid-credentials',
+                  );
+                } else {
+                  await showErrorDialog(
+                    // ignore: use_build_context_synchronously
+                    context,
+                    'ERROR: ${e.code}',
+                  );
                 }
+              } catch (e) {
+                await showErrorDialog(
+                  context,
+                  e.toString(),
+                );
               }
             },
             child: const Text(
