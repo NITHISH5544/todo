@@ -3,7 +3,7 @@ import 'package:todo/services/auth/auth_service.dart';
 import 'package:todo/services/crud/notes_service.dart';
 
 class NewNoteView extends StatefulWidget {
-  const NewNoteView({Key? key}) : super(key: key);
+  const NewNoteView({super.key});
 
   @override
   _NewNoteViewState createState() => _NewNoteViewState();
@@ -46,7 +46,11 @@ class _NewNoteViewState extends State<NewNoteView> {
     final currentUser = AuthService.firebase().currentUser!;
     final email = currentUser.email!;
     final owner = await _notesService.getUser(email: email);
-    return await _notesService.createNote(owner: owner);
+    //return await _notesService.createNote(owner: owner);
+    return await _notesService.createNote(
+      owner: owner,
+      text: "This is my new note!",
+    );
   }
 
   void _deleteNoteIfTextIsEmpty() {
@@ -86,7 +90,7 @@ class _NewNoteViewState extends State<NewNoteView> {
         builder: (context, snapshot) {
           switch (snapshot.connectionState) {
             case ConnectionState.done:
-              _note = snapshot.data as DatabaseNote;
+              _note = snapshot.data;
               _setupTextControllerListener();
               return TextField(
                 controller: _textController,
