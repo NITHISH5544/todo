@@ -15,3 +15,5 @@ class DataBaseAlreadyOpenException implements Exception {}
 class UnableToGetDocumentDirectory implements Exception {}
 
 class DatabaseIsNotOpen implements Exception {}
+
+class UserShouldBeSetBeforeReadingAllNotes implements Exception {}
