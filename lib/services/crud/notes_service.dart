@@ -20,7 +20,7 @@ class NotesService {
       onListen: () {
         _notesStreamController.sink.add(_notes);
         // _notesStreamController.add(_notes);
-        print("Current notes: $_notes");
+        //print("Current notes: $_notes");
       },
     );
   }
@@ -65,7 +65,7 @@ class NotesService {
     _notes.clear();
 
     final allNotes = await getAllNotes();
-    print("Fetched notes from database: $allNotes");
+    //print("Fetched notes from database: $allNotes");
     _notes.addAll(allNotes);
     _notesStreamController.add(_notes);
   }
@@ -136,12 +136,12 @@ class NotesService {
 
     // Fetch notes from the database
     final notes = await db.query(noteTable);
-    print("Fetched raw notes from database: $notes");
+    // print("Fetched raw notes from database: $notes");
 
     // Map database rows to note objects
     final mappedNotes = notes.map((noteRow) {
       final note = DatabaseNote.fromRow(noteRow);
-      print("Mapped note: $note");
+      // print("Mapped note: $note");
       return note;
     });
 
@@ -423,7 +423,7 @@ class NotesService {
       final dbPath = join(docsPath.path, dbName);
 
       // Log the database file path
-      print("Database path: $dbPath");
+      //print("Database path: $dbPath");
 
       // Open the database
       final db = await openDatabase(dbPath);

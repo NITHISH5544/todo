@@ -14,6 +14,7 @@ class NotesView extends StatefulWidget {
   const NotesView({super.key});
 
   @override
+  // ignore: library_private_types_in_public_api
   _NotesViewState createState() => _NotesViewState();
 }
 
@@ -46,6 +47,7 @@ class _NotesViewState extends State<NotesView> {
                   final shouldLogout = await showLogOutDialog(context);
                   if (shouldLogout) {
                     await AuthService.firebase().logOut();
+                    // ignore: use_build_context_synchronously
                     Navigator.of(context).pushNamedAndRemoveUntil(
                       loginRoute,
                       (_) => false,
