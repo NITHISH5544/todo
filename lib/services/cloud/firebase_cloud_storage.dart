@@ -41,26 +41,31 @@ class FirebaseCloudStorage {
           )
           .get() //converts query got from notes.where to Future<QuerySnapshot...> to make it possible to execute
           .then(
-            (value) => value.docs.map(
-              (doc) {
-                return CloudNote(
-                  documentId: doc.id,
-                  ownerUserId: doc.data()[ownerUserIdFieldName] as String,
-                  text: doc.data()[textFieldName] as String,
-                );
-              },
-            ),
+            (value) => value.docs.map((doc) => CloudNote.fromSnapshot(doc)),
+            // (doc) {
+            //   return CloudNote(
+            //     documentId: doc.id,
+            //     ownerUserId: doc.data()[ownerUserIdFieldName] as String,
+            //     text: doc.data()[textFieldName] as String,
+            //   );
+            // },
           );
     } catch (e) {
       throw CouldNotGetAllNotesException();
     }
   }
 
-  void createNote({required String ownerUserId}) async {
-    await notes.add({
+  Future<CloudNote> createNote({required String ownerUserId}) async {
+    final document = await notes.add({
       ownerUserIdFieldName: ownerUserId,
       textFieldName: '',
     });
+    final fetchNote = await document.get();
+    return CloudNote(
+      documentId: fetchNote.id,
+      ownerUserId: ownerUserId,
+      text: '',
+    );
   }
 
 //creation of singleton
