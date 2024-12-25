@@ -5,6 +5,7 @@ import 'package:todo/services/auth/auth_exceptions.dart';
 import 'package:todo/services/auth/auth_service.dart';
 import 'package:todo/services/auth/bloc/auth_bloc.dart';
 import 'package:todo/services/auth/bloc/auth_event.dart';
+import 'package:todo/services/auth/bloc/auth_state.dart';
 import 'package:todo/utilities/dialgos/error_dialod.dart';
 
 class LoginView extends StatefulWidget {
@@ -59,66 +60,35 @@ class _LoginViewState extends State<LoginView> {
             enableSuggestions: false,
             autocorrect: false,
           ),
-          TextButton(
-            onPressed: () async {
-              final email = _email.text;
-              final password = _password.text;
-              AuthService.firebase().logOut();
-              // NOTE: to remove cache of previous user credentials. of they exists
-
-              try {
-                context.read<AuthBloc>().add(AuthEventLogIn(
-                      email,
-                      password,
-                    ));
-                // await AuthService.firebase().logIn(
-                //   email: email,
-                //   password: password,
-                // );
-
-                // if (!context.mounted) return;
-                // // ignore: use_build_context_synchronously
-                // final user = AuthService.firebase().currentUser;
-                // if (user?.isEmailVerified ?? false) {
-                //   //email is verified
-                //   Navigator.of(context).pushNamedAndRemoveUntil(
-                //     notesRoute,
-                //     (route) => false,
-                //   );
-                // } else {
-                //   //email is not verified
-                //   Navigator.of(context).pushNamedAndRemoveUntil(
-                //     verifyEmailRoute,
-                //     (route) => false,
-                //   );
-                // }
-              } on UserNotFoundAuthException {
-                await showErrorDialog(
-                    // ignore: use_build_context_synchronously
-                    context,
-                    'User-not-found');
-              } on WrongPasswordAuthException {
-                await showErrorDialog(
-                  // ignore: use_build_context_synchronously
-                  context,
-                  'wrong-password',
-                );
-              } on InvalidCredentialAuthException {
-                await showErrorDialog(
-                  // ignore: use_build_context_synchronously
-                  context,
-                  'invalid-credentials',
-                );
-              } on GenericAuthException {
-                await showErrorDialog(
-                  context,
-                  'Authentication Error',
-                );
+          BlocListener<AuthBloc, AuthState>(
+            listener: (context, state) async {
+              if (state is AuthStateLoggedOut) {
+                if (state.exception is UserNotFoundAuthException) {
+                  await showErrorDialog(context, 'Usernot found');
+                } else if (state.exception is WrongPasswordAuthException) {
+                  await showErrorDialog(context, 'wrong credentials');
+                } else if (state.exception is GenericAuthException) {
+                  await showErrorDialog(context, 'Authentiaction error');
+                }
               }
             },
-            child: const Text(
-              'Login',
-              selectionColor: Colors.teal,
+            child: TextButton(
+              onPressed: () async {
+                final email = _email.text;
+                final password = _password.text;
+                //AuthService.firebase().logOut();
+                // NOTE: to remove cache of previous user credentials. of they exists
+                context.read<AuthBloc>().add(
+                      AuthEventLogIn(
+                        email,
+                        password,
+                      ),
+                    );
+              },
+              child: const Text(
+                'Login',
+                selectionColor: Colors.teal,
+              ),
             ),
           ),
           TextButton(
