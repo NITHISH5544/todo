@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
-
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:todo/constants/routes.dart';
 import 'package:todo/services/auth/auth_exceptions.dart';
 import 'package:todo/services/auth/auth_service.dart';
+import 'package:todo/services/auth/bloc/auth_bloc.dart';
+import 'package:todo/services/auth/bloc/auth_event.dart';
 import 'package:todo/utilities/dialgos/error_dialod.dart';
 
 class LoginView extends StatefulWidget {
@@ -65,27 +67,31 @@ class _LoginViewState extends State<LoginView> {
               // NOTE: to remove cache of previous user credentials. of they exists
 
               try {
-                await AuthService.firebase().logIn(
-                  email: email,
-                  password: password,
-                );
+                context.read<AuthBloc>().add(AuthEventLogIn(
+                      email,
+                      password,
+                    ));
+                // await AuthService.firebase().logIn(
+                //   email: email,
+                //   password: password,
+                // );
 
-                if (!context.mounted) return;
-                // ignore: use_build_context_synchronously
-                final user = AuthService.firebase().currentUser;
-                if (user?.isEmailVerified ?? false) {
-                  //email is verified
-                  Navigator.of(context).pushNamedAndRemoveUntil(
-                    notesRoute,
-                    (route) => false,
-                  );
-                } else {
-                  //email is not verified
-                  Navigator.of(context).pushNamedAndRemoveUntil(
-                    verifyEmailRoute,
-                    (route) => false,
-                  );
-                }
+                // if (!context.mounted) return;
+                // // ignore: use_build_context_synchronously
+                // final user = AuthService.firebase().currentUser;
+                // if (user?.isEmailVerified ?? false) {
+                //   //email is verified
+                //   Navigator.of(context).pushNamedAndRemoveUntil(
+                //     notesRoute,
+                //     (route) => false,
+                //   );
+                // } else {
+                //   //email is not verified
+                //   Navigator.of(context).pushNamedAndRemoveUntil(
+                //     verifyEmailRoute,
+                //     (route) => false,
+                //   );
+                // }
               } on UserNotFoundAuthException {
                 await showErrorDialog(
                     // ignore: use_build_context_synchronously
